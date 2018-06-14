@@ -1,6 +1,10 @@
 package com.r.place;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +26,7 @@ public class CanvasController {
                     @RequestParam(name="height", required=false, defaultValue="4") String height, Model model) {
         Canvas n = new Canvas(Integer.parseInt(width), Integer.parseInt(height));
         canvasRepository.save(n);
-        return "added";
+        return "New canvas added";
     }
 
     @GetMapping(path="/all")
@@ -56,9 +60,22 @@ public class CanvasController {
                                       @RequestParam(name="y") String y,
                                       @RequestParam(name="color") String color, Model model) {
         Canvas c = this.getLastCanvas();
-        c.setPixel(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(color));
+        int xx = Integer.parseInt(x);
+        int yy = Integer.parseInt(y);
+        byte co = (byte)(Integer.parseInt(color) & 0xff);
+        if (xx >= c.getWidth()) {
+            return "x wrong";
+        }
+        if (yy >= c.getHeight()) {
+            return "y wrong";
+        }
+        if (co >= 17) {
+            return "color wrong";
+        }
+
+        c.setPixel(xx, yy, co);
         canvasRepository.save(c);
-        return "pixel saved";
+        return "ok";
     }
 
     @GetMapping(path="/show")
@@ -66,13 +83,28 @@ public class CanvasController {
         Canvas c = this.getLastCanvas();
         StringBuilder sb = new StringBuilder();
 
-        for (int x = 0; x < c.getWidth(); x++) {
-            for (int y = 0; y < c.getHeight(); y++) {
+        for (int y = 0; y < c.getHeight(); y++) {
+            for (int x = 0; x < c.getWidth(); x++) {
                sb.append(String.format("(%d), ", c.getPixel(x, y)));
             }
             sb.append("<br>");
         }
 
         return sb.toString();
+    }
+
+    @GetMapping(path="/get")
+    public @ResponseBody String get() {
+        Canvas c = this.getLastCanvas();
+
+        byte[] abc = {0,12,32};
+        return new String(Base64.encodeBase64(abc));
+    }
+
+    @GetMapping(path = "/hello", produces=MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String sayHello()
+    {
+        Canvas c = this.getLastCanvas();
+        return String.format("{\"width\": %d, \"height\": %d,  \"data\": \"%s\"}", c.getWidth(), c.getHeight(), new String(Base64.encodeBase64(c.getData())));
     }
 }

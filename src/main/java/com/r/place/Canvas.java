@@ -13,7 +13,7 @@ public class Canvas {
     private Long id;
     private Integer width;
     private Integer height;
-    int[] data;
+    byte[] data;
 
     public Long getId() {
         return id;
@@ -27,8 +27,12 @@ public class Canvas {
         return height;
     }
 
-    public int getPixel(int x, int y) {
+    public byte getPixel(int x, int y) {
         return data[ y * getWidth() + x];
+    }
+
+    public byte[] getData() {
+        return data;
     }
 
     public void setHeight(Integer height) {
@@ -44,7 +48,7 @@ public class Canvas {
         this.id = id;
     }
 
-    public void setPixel(int x, int y, int color) {
+    public void setPixel(int x, int y, byte color) {
         data[ y * getWidth() + x] = color;
     }
 
@@ -53,7 +57,7 @@ public class Canvas {
     public Canvas(Integer width, Integer height) {
         this.width = width;
         this.height = height;
-        this.data = new int[width * height];
+        this.data = new byte[width * height];
     }
 
     @Override
