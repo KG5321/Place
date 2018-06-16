@@ -1,4 +1,4 @@
-# [![Place](https://b.thumbs.redditmedia.com/_7OelYuni-KAAz9yCHzwG78d2OZrQcpRsDXPeS72P0k.png)](https://github.com/KG5321/Place=50x50) Place
+# [![Place](https://b.thumbs.redditmedia.com/_7OelYuni-KAAz9yCHzwG78d2OZrQcpRsDXPeS72P0k.png){:height="50%" width="50%"}](https://github.com/KG5321/Place) Place
 
 Web application created for Java EE project.
 
