@@ -1,4 +1,4 @@
-# <img src="https://b.thumbs.redditmedia.com/_7OelYuni-KAAz9yCHzwG78d2OZrQcpRsDXPeS72P0k.png" width="100" height="100"> Place
+# <img src="https://b.thumbs.redditmedia.com/_7OelYuni-KAAz9yCHzwG78d2OZrQcpRsDXPeS72P0k.png" width="50" height="50"> Place
 
 Web application created for Java EE project.
 
