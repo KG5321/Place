@@ -1,4 +1,4 @@
-# <img src="https://your-image-url.type" width="50" height="50"> (https://github.com/KG5321/Place) Place
+# [<https://b.thumbs.redditmedia.com/_7OelYuni-KAAz9yCHzwG78d2OZrQcpRsDXPeS72P0k.png" width="50" height="50">](https://github.com/KG5321/Place) Place
 
 Web application created for Java EE project.
 
