@@ -22,8 +22,8 @@ public class CanvasController {
 
     @GetMapping(path="/add")
     public @ResponseBody
-    String greeting(@RequestParam(name="width", required=false, defaultValue="5") String width,
-                    @RequestParam(name="height", required=false, defaultValue="4") String height, Model model) {
+    String greeting(@RequestParam(name="width", required=false, defaultValue="2") String width,
+                    @RequestParam(name="height", required=false, defaultValue="2") String height, Model model) {
         Canvas n = new Canvas(Integer.parseInt(width), Integer.parseInt(height));
         canvasRepository.save(n);
         return "New canvas added";
@@ -58,22 +58,23 @@ public class CanvasController {
     @GetMapping(path="/pixel")
     public @ResponseBody String pixel(@RequestParam(name="x") String x,
                                       @RequestParam(name="y") String y,
-                                      @RequestParam(name="color") String color, Model model) {
+                                      @RequestParam(name="R") String R,
+                                      @RequestParam(name="G") String G,
+                                      @RequestParam(name="B") String B) {
         Canvas c = this.getLastCanvas();
         int xx = Integer.parseInt(x);
         int yy = Integer.parseInt(y);
-        byte co = (byte)(Integer.parseInt(color) & 0xff);
+        byte rr = (byte)(Integer.parseInt(R) & 0xff);
+        byte bb = (byte)(Integer.parseInt(B) & 0xff);
+        byte gg = (byte)(Integer.parseInt(G) & 0xff);
         if (xx >= c.getWidth()) {
             return "x wrong";
         }
         if (yy >= c.getHeight()) {
             return "y wrong";
         }
-        if (co >= 17) {
-            return "color wrong";
-        }
 
-        c.setPixel(xx, yy, co);
+        c.setPixel(xx, yy, rr, bb, gg);
         canvasRepository.save(c);
         return "ok";
     }
@@ -93,15 +94,8 @@ public class CanvasController {
         return sb.toString();
     }
 
-    @GetMapping(path="/get")
-    public @ResponseBody String get() {
-        Canvas c = this.getLastCanvas();
 
-        byte[] abc = {0,12,32};
-        return new String(Base64.encodeBase64(abc));
-    }
-
-    @GetMapping(path = "/hello", produces=MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/get", produces=MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody String sayHello()
     {
         Canvas c = this.getLastCanvas();

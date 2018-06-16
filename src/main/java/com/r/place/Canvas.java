@@ -28,7 +28,7 @@ public class Canvas {
     }
 
     public byte getPixel(int x, int y) {
-        return data[ y * getWidth() + x];
+        return data[ (y * getWidth() + x)*4];
     }
 
     public byte[] getData() {
@@ -48,8 +48,11 @@ public class Canvas {
         this.id = id;
     }
 
-    public void setPixel(int x, int y, byte color) {
-        data[ y * getWidth() + x] = color;
+    public void setPixel(int x, int y, byte r, byte b, byte g) {
+        data[ (y * getWidth() + x)*4 + 0] = r;
+        data[ (y * getWidth() + x)*4 + 1] = g;
+        data[ (y * getWidth() + x)*4 + 2] = b;
+        data[ (y * getWidth() + x)*4 + 3] = (byte) 0xff;
     }
 
     protected Canvas() {}
@@ -57,7 +60,7 @@ public class Canvas {
     public Canvas(Integer width, Integer height) {
         this.width = width;
         this.height = height;
-        this.data = new byte[width * height];
+        this.data = new byte[width * height*4];
     }
 
     @Override

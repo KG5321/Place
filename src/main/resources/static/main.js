@@ -1,7 +1,3 @@
-window.createSocket = function createSocket(url) {
-    return new WebSocket(url);
-};
-
 window.onresize = function(event) {
     viewport.width = window.innerWidth;
     viewport.height = window.innerHeight;
@@ -106,9 +102,9 @@ window.ondblclick = function dblclick(event) {
             view.setUint8(9, viewport.color[1]);
             view.setUint8(10, viewport.color[2]);
             view.setUint8(11, viewport.color[3]);
-
-            socket.send(data);
-
+            var link = 'http://localhost:8080/canvas/pixel?x='+x+'&y='+y+'&R='+viewport.color[0]+'&G='+viewport.color[1]+'&B='+viewport.color[2];
+            console.log(link);
+            $.get(link);
             viewport.tileX = null;
             viewport.tileY = null;
         }
@@ -120,6 +116,7 @@ window.ondblclick = function dblclick(event) {
         return event.preventDefault();
     }
 };
+
 
 window.ontouchstart = function(event) {
     var screenX, screenY;
@@ -287,19 +284,14 @@ viewport.render = function render() {
 };
 
 requestAnimationFrame(function() {
+    console.log("Rendering.");
     viewport.render();
 });
 
 content.appendChild(viewport);
 
-var socket = window.createSocket(
-    location.protocol.replace('http', 'ws') + '//' + location.host + '/ws/info'
-);
 
-socket.binaryType = 'arraybuffer';
-socket.onopen = function(event) {
-    socket.reconnect = true;
-
+function onopen() {
     var hint = document.createElement('p');
     hint.id = 'hint';
 
@@ -348,8 +340,9 @@ socket.onopen = function(event) {
     }, 0);
 };
 
-socket.onmessage = function(event) {
-    var data = new Uint8Array(event.data);
+function onmessage(width,height,data) {
+    //var data = new Uint8Array(data);
+
     var view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
     if (data.byteLength == 8) {
@@ -386,11 +379,11 @@ socket.onmessage = function(event) {
         var canvas = viewport.canvas;
         var context = canvas.getContext('2d');
 
-        var x = view.getUint16(0);
-        var y = view.getUint16(2);
+        var x = 0;//view.getUint16(0);
+        var y = 0; //view.getUint16(2);
 
-        var width = view.getUint16(4);
-        var height = view.getUint16(6);
+        // var width = 2;//view.getUint16(4);
+        // var height = 2;//view.getUint16(6);
 
         if ((width != 1 && width != canvas.width) || (height != 1 && height != canvas.height)) {
             var bitmap = context.getImageData(0, 0, canvas.width, canvas.height);
@@ -402,17 +395,21 @@ socket.onmessage = function(event) {
         }
 
         var bitmap = context.getImageData(x, y, width, height);
-        bitmap.data.set(data.slice(8));
+        bitmap.data.set(data.slice(0));
 
-        context.putImageData(bitmap, x, y);
+        console.log(bitmap);
 
-        requestAnimationFrame(function() {
+        context.putImageData(bitmap, 0, 0);
+
+        console.log(context.getImageData(x, y, width, height));
+
+        requestAnimationFrame(function () {
             viewport.render();
         });
     }
 };
 
-socket.onclose = function() {
+function onclose() {
     var status = document.createElement('p');
     status.className = 'hint';
 
@@ -432,3 +429,47 @@ socket.onclose = function() {
 
     content.appendChild(status);
 };
+onopen();
+
+var data = new Uint8Array(16);
+/*
+r g b a
+0 1 2 3
+4 5 6 7
+8 9 10 11
+12 13 14 15 */
+data[3] = 0xff;
+data[7] = 0xff;
+data[11] = 0xff;
+data[15] = 0xff;
+data[0] = 0xff;
+data[5] = 0xff;
+data[10] = 0xff;
+data[12] = 0xff;
+
+// onmessage(data);
+
+$(function() {
+    startRefresh();
+});
+
+function convertBase64(data){
+    var raw = window.atob(data);
+    var rawLength = raw.length;
+    var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+    for(i = 0; i < rawLength; i++) {
+        array[i] = raw.charCodeAt(i);
+    }
+    return array;
+}
+
+function startRefresh() {
+    setTimeout(startRefresh,1000);
+    $.get('http://localhost:8080/canvas/get', function(data) {
+        var array = convertBase64(data.data);
+        var width = data.width;
+        var height = data.height;
+        onmessage(width, height, array);
+    });
+}
