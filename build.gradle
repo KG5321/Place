@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("se.transmode.gradle:gradle-docker:1.2")
     }
 }
 
@@ -15,6 +16,10 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
+jar {
+    baseName = 'place_test'
+    version = '0.0.1-SNAPSHOT'
+}
 group = 'com.r'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 10
@@ -33,7 +38,22 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-websocket')
     compile('org.springframework.session:spring-session-core')
     runtime('org.springframework.boot:spring-boot-devtools')
-    compileOnly('org.projectlombok:lombok')
+//    compileOnly('org.projectlombok:lombok')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile('org.springframework.security:spring-security-test')
+}
+
+apply plugin: 'docker'
+
+
+task buildDocker(type: Docker, dependsOn: build) {
+    push = false
+    applicationName = jar.baseName
+    dockerfile = file('src/main/docker/Dockerfile')
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
 }

@@ -102,7 +102,7 @@ window.ondblclick = function dblclick(event) {
             view.setUint8(9, viewport.color[1]);
             view.setUint8(10, viewport.color[2]);
             view.setUint8(11, viewport.color[3]);
-            var link = 'http://localhost:8080/canvas/pixel?x='+x+'&y='+y+'&R='+viewport.color[0]+'&G='+viewport.color[1]+'&B='+viewport.color[2];
+            var link = '/canvas/pixel?x='+x+'&y='+y+'&R='+viewport.color[0]+'&G='+viewport.color[1]+'&B='+viewport.color[2];
             console.log(link);
             $.get(link);
             viewport.tileX = null;
@@ -466,7 +466,7 @@ function convertBase64(data){
 
 function startRefresh() {
     setTimeout(startRefresh,1000);
-    $.get('http://localhost:8080/canvas/get', function(data) {
+    $.get('/canvas/get', function(data) {
         var array = convertBase64(data.data);
         var width = data.width;
         var height = data.height;
